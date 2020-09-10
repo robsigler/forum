@@ -1,0 +1,5 @@
+app.db
+bin
+obj
+.vscode
+.idea
