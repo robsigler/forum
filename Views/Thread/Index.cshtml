@@ -2,11 +2,23 @@
     ViewData["Title"] = "Threads";
 }
 
-<ul>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">Subject</th>
+    </tr>
+  </thead>
+  <tbody>
     @foreach (Thread thread in Model)
     {
-        <li>
-            @Html.DisplayFor(modelItem => thread.Subject)
-        </li>
+        <tr>
+            <th scope="row">
+                <h5 class="mb-1">
+                    @Html.DisplayFor(modelItem => thread.Subject)
+                </h5>
+                <p class="mb-1">by unknown, on @Html.DisplayFor(modelItem => thread.CreatedDate)</p>
+            </th>
+        </tr>
     }
-</ul>
+  </tbody>
+</table>
