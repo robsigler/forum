@@ -27,7 +27,7 @@ namespace Forum
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
-           services.AddRazorPages();
+            services.AddRazorPages();
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
         }
@@ -46,7 +46,8 @@ namespace Forum
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            app.UseHttpsRedirection();
+
+            // app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -56,12 +57,12 @@ namespace Forum
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(name: "threads",
+                    pattern: "threads/{action=Index}/{id?}",
+                    defaults: new {controller = "Thread"});
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapControllerRoute(
-                    name: "threads",
-                    pattern: "Threads/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
             });
         }

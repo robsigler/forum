@@ -1,0 +1,12 @@
+﻿@{
+    ViewData["Title"] = "Threads";
+}
+
+<ul>
+    @foreach (Thread thread in Model)
+    {
+        <li>
+            @Html.DisplayFor(modelItem => thread.Subject)
+        </li>
+    }
+</ul>

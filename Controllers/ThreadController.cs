@@ -3,35 +3,68 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Forum.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Forum.Models;
+using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
 
 namespace Forum.Controllers
 {
     public class ThreadController : Controller
     {
+        private readonly ApplicationDbContext _context;
         private readonly ILogger<ThreadController> _logger;
 
-        public ThreadController(ILogger<ThreadController> logger)
+        public ThreadController(ILogger<ThreadController> logger, ApplicationDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
         public IActionResult Index()
         {
+            var count = _context.Threads.Count();
+            var items = _context.Threads.Take(5).ToList();
+            return View(items);
+        }
+
+        public IActionResult Create()
+        {
             return View();
         }
 
-        public IActionResult Privacy()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(
+            [Bind("Subject,Body")] Thread thread)
         {
-            return View();
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    thread.CreatedDate = DateTime.Now;
+                    _context.Threads.Add(thread);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex.ToString());
+                ModelState.AddModelError("", "Unable to save changes. " +
+                                             "Try again, and if the problem persists " +
+                                             "see your system administrator.");
+            }
+
+            return View(thread);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
     }
 }

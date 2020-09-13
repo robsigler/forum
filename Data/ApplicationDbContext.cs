@@ -10,6 +10,7 @@ namespace Forum.Data
             : base(options)
         {
         }
+
         public DbSet<Thread> Threads { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

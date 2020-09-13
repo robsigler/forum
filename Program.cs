@@ -14,7 +14,7 @@ namespace Forum
             var host = CreateHostBuilder(args).Build();
 
             CreateDbIfNotExists(host);
-            
+
             host.Run();
         }
 
@@ -39,9 +39,6 @@ namespace Forum
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 }
