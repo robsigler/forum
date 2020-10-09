@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Forum.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SQLitePCL;
 
@@ -17,11 +18,13 @@ namespace Forum.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<ThreadController> _logger;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public ThreadController(ILogger<ThreadController> logger, ApplicationDbContext context)
+        public ThreadController(ILogger<ThreadController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
             _context = context;
+            _userManager = userManager;
         }
 
         public IActionResult Index()
@@ -43,6 +46,8 @@ namespace Forum.Controllers
         public async Task<IActionResult> Create(
             [Bind("Subject,Body")] Thread thread)
         {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            Console.WriteLine("Hello World!");
             try
             {
                 if (ModelState.IsValid)
