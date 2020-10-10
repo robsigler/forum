@@ -2,6 +2,9 @@
     ViewData["Title"] = "Threads";
 }
 
+<div class="above-threads mb-2">
+  <a type="button" class="btn btn-primary" href="/threads/Create">Create New Thread</a>
+</div>
 <table class="table table-bordered">
   <thead>
     <tr>
@@ -16,7 +19,7 @@
                 <h5 class="mb-1">
                     @Html.DisplayFor(modelItem => thread.Subject)
                 </h5>
-                <p class="mb-1">by unknown, on @Html.DisplayFor(modelItem => thread.CreatedDate)</p>
+                <p class="mb-1">by @Html.DisplayFor(mdoelItem => thread.Author.UserName), on @Html.DisplayFor(modelItem => thread.CreatedDate)</p>
             </th>
         </tr>
     }

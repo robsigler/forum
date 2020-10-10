@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Forum.Models
 {
@@ -10,6 +11,6 @@ namespace Forum.Models
         public string Body { get; set; }
         public DateTime CreatedDate { get; set; }
         public string AuthorId { get; set; }
-        public IdentityUser Author { get; set; }
+        public virtual ApplicationUser Author { get; set; }
     }
 }

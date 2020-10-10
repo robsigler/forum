@@ -18,9 +18,9 @@ namespace Forum.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<ThreadController> _logger;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ThreadController(ILogger<ThreadController> logger, ApplicationDbContext context, UserManager<IdentityUser> userManager)
+        public ThreadController(ILogger<ThreadController> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _context = context;
@@ -30,7 +30,10 @@ namespace Forum.Controllers
         public IActionResult Index()
         {
             var count = _context.Threads.Count();
-            var items = _context.Threads.Take(5).ToList();
+            var items = _context.Threads
+                .Take(5)
+                .Include(t => t.Author)
+                .ToList();
             return View(items);
         }
 
@@ -47,12 +50,12 @@ namespace Forum.Controllers
             [Bind("Subject,Body")] Thread thread)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            Console.WriteLine("Hello World!");
             try
             {
                 if (ModelState.IsValid)
                 {
                     thread.CreatedDate = DateTime.Now;
+                    thread.AuthorId = user.Id;
                     _context.Threads.Add(thread);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
