@@ -13,6 +13,7 @@ namespace Forum.Data
         }
 
         public DbSet<Thread> Threads { get; set; }
+        public DbSet<Reply> Replies { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -22,6 +23,14 @@ namespace Forum.Data
                 .HasOne(t => t.Author)
                 .WithMany(a => a.AuthoredThreads)
                 .HasForeignKey(t => t.AuthorId);
+            modelBuilder.Entity<Reply>()
+                .HasOne(r => r.Thread)
+                .WithMany()
+                .HasForeignKey(r => r.ThreadId);
+            modelBuilder.Entity<Reply>()
+                .HasOne(r => r.Author)
+                .WithMany()
+                .HasForeignKey(r => r.AuthorId);
         }
     }
 }
