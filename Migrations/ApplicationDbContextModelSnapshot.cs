@@ -80,7 +80,7 @@ namespace Forum.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("Forum.Models.Thread", b =>
+            modelBuilder.Entity("Forum.Models.Post", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -90,6 +90,30 @@ namespace Forum.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Body")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ThreadId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("ThreadId");
+
+                    b.ToTable("Post");
+                });
+
+            modelBuilder.Entity("Forum.Models.Thread", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AuthorId")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedDate")
@@ -235,6 +259,19 @@ namespace Forum.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens");
+                });
+
+            modelBuilder.Entity("Forum.Models.Post", b =>
+                {
+                    b.HasOne("Forum.Models.ApplicationUser", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId");
+
+                    b.HasOne("Forum.Models.Thread", "Thread")
+                        .WithMany("Posts")
+                        .HasForeignKey("ThreadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Forum.Models.Thread", b =>

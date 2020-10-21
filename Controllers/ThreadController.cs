@@ -47,16 +47,26 @@ namespace Forum.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Subject,Body")] Thread thread)
+            [Bind("Subject,Body")] NewThreadViewModel newThreadViewModel)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
+            var thread = new Thread();
             try
             {
                 if (ModelState.IsValid)
                 {
+                    thread.Subject = newThreadViewModel.Subject;
                     thread.CreatedDate = DateTime.Now;
                     thread.AuthorId = user.Id;
                     _context.Threads.Add(thread);
+                    await _context.SaveChangesAsync();
+                    // TODO: handle situation where thread gets created but post does not
+                    var post = new Post();
+                    post.Body = newThreadViewModel.Body;
+                    post.CreatedDate = DateTime.Now;
+                    post.AuthorId = user.Id;
+                    post.ThreadId = thread.ID;
+                    _context.Posts.Add(post);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }

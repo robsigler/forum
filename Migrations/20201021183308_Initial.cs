@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Forum.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -159,7 +159,6 @@ namespace Forum.Migrations
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Subject = table.Column<string>(nullable: true),
-                    Body = table.Column<string>(nullable: true),
                     CreatedDate = table.Column<DateTime>(nullable: false),
                     AuthorId = table.Column<string>(nullable: true)
                 },
@@ -172,6 +171,34 @@ namespace Forum.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Post",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Body = table.Column<string>(nullable: true),
+                    CreatedDate = table.Column<DateTime>(nullable: false),
+                    AuthorId = table.Column<string>(nullable: true),
+                    ThreadId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Post", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Post_AspNetUsers_AuthorId",
+                        column: x => x.AuthorId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Post_Threads_ThreadId",
+                        column: x => x.ThreadId,
+                        principalTable: "Threads",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -212,6 +239,16 @@ namespace Forum.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Post_AuthorId",
+                table: "Post",
+                column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Post_ThreadId",
+                table: "Post",
+                column: "ThreadId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Threads_AuthorId",
                 table: "Threads",
                 column: "AuthorId");
@@ -235,10 +272,13 @@ namespace Forum.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Threads");
+                name: "Post");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Threads");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

@@ -5,13 +5,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Forum.Models
 {
-    public class Thread
+    public class Post
     {
         public int ID { get; set; }
-        public string Subject { get; set; }
+        public string Body { get; set; }
         public DateTime CreatedDate { get; set; }
         public string AuthorId { get; set; }
         public virtual ApplicationUser Author { get; set; }
-        public virtual ICollection<Post> Posts { get; set; }
+        public int ThreadId { get; set; }
+        public virtual Thread Thread { get; set; }
     }
 }
