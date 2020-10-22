@@ -104,7 +104,7 @@ namespace Forum.Migrations
 
                     b.HasIndex("ThreadId");
 
-                    b.ToTable("Post");
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("Forum.Models.Thread", b =>

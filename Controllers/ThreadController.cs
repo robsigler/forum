@@ -78,14 +78,20 @@ namespace Forum.Controllers
                                              "Try again, and if the problem persists " +
                                              "see your system administrator.");
             }
-
-            return View(thread);
+            return Redirect("/threads");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+        }
+
+        [Authorize]
+        public async Task<IActionResult> Get(int? id)
+        {
+            var thread = (await _context.Threads.Include(t => t.Posts).ThenInclude(p => p.Author).FirstOrDefaultAsync(t => t.ID == id));
+            return View(thread);
         }
     }
 }

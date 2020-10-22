@@ -17,9 +17,9 @@
         <tr>
             <th scope="row">
                 <h5 class="mb-1">
-                    @Html.DisplayFor(modelItem => thread.Subject)
+                    <a href="/threads/Get?id=@Html.DisplayFor(modelItem => thread.ID)">@Html.DisplayFor(modelItem => thread.Subject)</a>
                 </h5>
-                <p class="mb-1">by @Html.DisplayFor(mdoelItem => thread.Author.UserName), on @Html.DisplayFor(modelItem => thread.CreatedDate)</p>
+                <p class="mb-1">by @Html.DisplayFor(modelItem => thread.Author.UserName), on @Html.DisplayFor(modelItem => thread.CreatedDate)</p>
             </th>
         </tr>
     }

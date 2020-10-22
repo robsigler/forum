@@ -174,7 +174,7 @@ namespace Forum.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Post",
+                name: "Posts",
                 columns: table => new
                 {
                     ID = table.Column<int>(nullable: false)
@@ -186,15 +186,15 @@ namespace Forum.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Post", x => x.ID);
+                    table.PrimaryKey("PK_Posts", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Post_AspNetUsers_AuthorId",
+                        name: "FK_Posts_AspNetUsers_AuthorId",
                         column: x => x.AuthorId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Post_Threads_ThreadId",
+                        name: "FK_Posts_Threads_ThreadId",
                         column: x => x.ThreadId,
                         principalTable: "Threads",
                         principalColumn: "ID",
@@ -239,13 +239,13 @@ namespace Forum.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Post_AuthorId",
-                table: "Post",
+                name: "IX_Posts_AuthorId",
+                table: "Posts",
                 column: "AuthorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Post_ThreadId",
-                table: "Post",
+                name: "IX_Posts_ThreadId",
+                table: "Posts",
                 column: "ThreadId");
 
             migrationBuilder.CreateIndex(
@@ -272,7 +272,7 @@ namespace Forum.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Post");
+                name: "Posts");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
