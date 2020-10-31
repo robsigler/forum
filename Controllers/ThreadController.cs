@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,6 +13,8 @@ using SQLitePCL;
 
 namespace Forum.Controllers
 {
+    [Route("threads")]
+    [Controller]
     public class ThreadController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -27,6 +28,8 @@ namespace Forum.Controllers
             _userManager = userManager;
         }
 
+        [Authorize]
+        [HttpGet]
         public IActionResult Index()
         {
             var count = _context.Threads.Count();
@@ -38,13 +41,14 @@ namespace Forum.Controllers
         }
 
         [Authorize]
+        [HttpGet("create")]
         public IActionResult Create()
         {
             return View();
         }
 
         [Authorize]
-        [HttpPost]
+        [HttpPost("create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind("Subject,Body")] NewThreadViewModel newThreadViewModel)
@@ -78,7 +82,7 @@ namespace Forum.Controllers
                                              "Try again, and if the problem persists " +
                                              "see your system administrator.");
             }
-            return Redirect("/threads");
+            return Redirect("/threads/" + thread.ID);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -88,10 +92,54 @@ namespace Forum.Controllers
         }
 
         [Authorize]
-        public async Task<IActionResult> Get(int? id)
+        [HttpGet]
+        [Route("{id:int}", Name="GetThread")]
+        public async Task<IActionResult> GetThread(int id)
         {
             var thread = (await _context.Threads.Include(t => t.Posts).ThenInclude(p => p.Author).FirstOrDefaultAsync(t => t.ID == id));
-            return View(thread);
+            return View("Get", thread);
+        }
+
+        [Authorize]
+        [HttpGet("{id:int}/reply")]
+        public IActionResult GetNewReplyPage(int id)
+        {
+            var viewModel = new NewReplyViewModel();
+            viewModel.ThreadId = id;
+            return View("Reply/Create", viewModel);
+        }
+
+        [Authorize]
+        [HttpPost("{id:int}/reply")]
+        [Route("{id:int}/reply", Name="PostReply")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PostReply(
+            int id,
+            [Bind("Body")] NewReplyViewModel newReplyViewModel)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var post = new Post();
+                    post.Body = newReplyViewModel.Body;
+                    post.CreatedDate = DateTime.Now;
+                    post.AuthorId = user.Id;
+                    post.ThreadId = id;
+                    _context.Posts.Add(post);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex.ToString());
+                ModelState.AddModelError("", "Unable to save changes. " +
+                                             "Try again, and if the problem persists " +
+                                             "see your system administrator.");
+            }
+            return Redirect("/threads");
         }
     }
 }

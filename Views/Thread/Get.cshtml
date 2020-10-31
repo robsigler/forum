@@ -4,6 +4,11 @@
     ViewData["Title"] = "Thread";
 }
 
+
+<div class="above-threads mb-2">
+  <a type="button" class="btn btn-primary" href="/threads/@Html.DisplayFor(modelItem => Model.ID)/reply">Post a Reply</a>
+</div>
+
 <table class="table table-bordered">
   <thead>
     <tr>
