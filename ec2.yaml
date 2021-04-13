@@ -1,0 +1,249 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Resources:
+
+  AutoScalingGroup:
+    Type: "AWS::AutoScaling::AutoScalingGroup"
+    Properties:
+      LaunchConfigurationName:
+        Ref: "LaunchConfig"
+      VPCZoneIdentifier:
+        - "subnet-07cbf46f"
+      MaxSize: 1
+      MinSize: 1
+      Tags:
+        - Key: "Name"
+          Value: "MyApp"
+          PropagateAtLaunch: true
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: "PT15M"
+        Count: 1
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: true
+
+  LaunchConfig:
+    Type: "AWS::AutoScaling::LaunchConfiguration"
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          default:
+            - "setupmetrics"
+            - "setuplogs"
+        setupmetrics:
+          files:
+            /opt/nuvola/config/metrics.json:
+              group: "app-runner"
+              mode: "0644"
+              owner: "app-runner"
+              content: |
+                {
+                  "metrics": {
+                    "append_dimensions":{
+                      "InstanceId":"${aws:InstanceId}",
+                      "AutoScalingGroupName":"${aws:AutoScalingGroupName}"
+                    },
+                    "metrics_collected": {
+                      "disk": {
+                        "measurement": [ "used_percent", "free" ],
+                        "metrics_collection_interval": 60,
+                        "resources": [ "/" ]
+                      },
+                      "mem": {
+                        "measurement": [ "used_percent", "free" ],
+                        "metrics_collection_interval": 60,
+                        "resources": [ "/" ]
+                      }
+                    }
+                  }
+                }
+            /opt/nuvola/scripts/setup_metrics.sh:
+              content: |
+                #!/bin/bash -xe
+                amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/nuvola/config/metrics.json
+                amazon-cloudwatch-agent-ctl -a stop
+                amazon-cloudwatch-agent-ctl -a start
+          commands:
+            "0-setup-metrics":
+              command: "sh /opt/nuvola/scripts/setup_metrics.sh"
+        setuplogs:
+          files:
+            /opt/nuvola/config/logs.json:
+              group: "app-runner"
+              mode: "0644"
+              owner: "app-runner"
+              content:
+                Fn::Sub: |
+                  {
+                    "logs": {
+                      "logs_collected": {
+                        "files": {
+                          "collect_list": [
+                            {
+                              "file_path": "/var/log/messages",
+                              "log_group_name": "${LogGroup}",
+                              "log_stream_name": "/var/log/messages",
+                              "timezone": "UTC"
+                            },
+                            {
+                              "file_path": "/var/log/secure",
+                              "log_group_name": "${LogGroup}",
+                              "log_stream_name": "/var/log/secure",
+                              "timezone": "UTC"
+                            },
+                            {
+                              "file_path": "/var/log/cloud-init-output.log",
+                              "log_group_name": "${LogGroup}",
+                              "log_stream_name": "/var/log/cloud-init-output.log",
+                              "timezone": "UTC"
+                            }
+                          ]
+                        }
+                      },
+                      "log_stream_name": "{instance_id}",
+                      "force_flush_interval": 15
+                    }
+                  }
+            /opt/nuvola/scripts/setup_logs.sh:
+              content:
+                Fn::Sub: |
+                  #!/bin/bash -xe
+                  amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/nuvola/config/logs.json
+                  amazon-cloudwatch-agent-ctl -a stop
+                  amazon-cloudwatch-agent-ctl -a start
+                  /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource AutoScalingGroup --region ${AWS::Region}
+          commands:
+            "0-setup-logs":
+              command: "sh /opt/nuvola/scripts/setup_logs.sh"
+    Properties:
+      SecurityGroups:
+        - Ref: "OutboundSecurityGroup"
+      InstanceType: "t3a.nano"
+      ImageId: "ami-05d72852800cbf29e"
+      IamInstanceProfile:
+        Ref: "InstanceProfile"
+      BlockDeviceMappings:
+        - DeviceName: "/dev/xvda"
+          Ebs:
+            DeleteOnTermination: true
+            VolumeSize: 20
+            VolumeType: "gp2"
+      UserData:
+        Fn::Base64:
+          Fn::Sub: |
+            #!/bin/bash -xe
+            adduser app-runner;
+            /opt/aws/bin/cfn-init \
+              --verbose \
+              -c default \
+              --stack ${AWS::StackName} \
+              --resource LaunchConfig \
+              --region ${AWS::Region}
+  
+  Role:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "ec2.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  
+  InstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Roles:
+        - Ref: "Role"
+
+  LogGroup:
+    Type: "AWS::Logs::LogGroup"
+    Properties:
+      LogGroupName:
+        Fn::Sub: "/aws/ec2/myapp"
+      RetentionInDays: 7
+
+  OutboundSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: "Security group that allows outbound internet access"
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          FromPort: -1
+          ToPort: -1
+          CidrIp: "0.0.0.0/0"
+      VpcId: "vpc-d1c0d7b9"
+
+  EC2DiskFullAlarm:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - Ref: "EC2AlarmTopic"
+      AlarmDescription: "Goes off when EC2 instance's disk is nearly full"
+      ComparisonOperator: "GreaterThanThreshold"
+      OKActions: []
+      InsufficientDataActions: []
+      MetricName: "disk_used_percent"
+      Namespace: "CWAgent"
+      Statistic: "Average"
+      Dimensions:
+        - Name: "path"
+          Value: "/"
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: "AutoScalingGroup"
+        - Name: "device"
+          Value: "nvme0n1p1"
+        - Name: "fstype"
+          Value: "xfs"
+      Period: 300
+      EvaluationPeriods: 1
+      DatapointsToAlarm: 1
+      Threshold: 90.0
+      TreatMissingData: "ignore"
+  
+  EC2AlarmTopic:
+    Type: "AWS::SNS::Topic"
+  
+  EC2AlarmTopicPoliy:
+    Type: "AWS::SNS::TopicPolicy"
+    Properties:
+      Topics:
+        - Ref: "EC2AlarmTopic"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: "Allow"
+            Principal:
+              AWS: "*"
+            Action:
+              - "SNS:GetTopicAttributes"
+              - "SNS:SetTopicAttributes"
+              - "SNS:AddPermission"
+              - "SNS:RemovePermission"
+              - "SNS:DeleteTopic"
+              - "SNS:Subscribe"
+              - "SNS:ListSubscriptionsByTopic"
+              - "SNS:Publish"
+              - "SNS:Receive"
+            Resource:
+              Ref: "EC2AlarmTopic"
+            Condition:
+              StringEquals:
+                AWS:SourceOwner:
+                  Ref: "AWS::AccountId"
+
+  ResourceOwnerSubscription:
+    Type: "AWS::SNS::Subscription"
+    Properties:
+      Endpoint: "robert.b.sigler.mn@gmail.com"
+      Protocol: "email"
+      TopicArn:
+        Ref: EC2AlarmTopic
