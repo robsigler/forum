@@ -21,3 +21,9 @@ jobs:
       run: dotnet build --configuration Release --no-restore
     - name: Test
       run: dotnet test --no-restore --verbosity normal
+    - name: Deploy
+      run: |
+        dotnet publish --configuration Release --no-restore
+        echo $SSH_KEY >> tilde.pem
+        chmod 0600 tilde.pem
+        rsync -a -e "ssh -i tilde.pem" bin/Release/net5.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net5.0/publish
