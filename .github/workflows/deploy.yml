@@ -32,5 +32,5 @@ jobs:
         echo $KNOWN_HOST >> ~/.ssh/known_hosts
         echo -n $BASE64_SSH_KEY | base64 --decode >> ~/.ssh/tilde.pem
         chmod 600 ~/.ssh/tilde.pem
-        rsync -a -e "ssh -i tilde.pem" bin/Release/net5.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net5.0/publish
+        rsync -a -e "ssh -i ~/.ssh/tilde.pem" bin/Release/net5.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net5.0/publish
         ssh -i ~/.ssh/tilde.pem root@135.181.203.90 "systemctl restart forum.service"
