@@ -16,20 +16,21 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.100
-    - name: Install dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --configuration Release --no-restore
-    - name: Test
-      run: dotnet test --no-restore --verbosity normal
+    # - name: Install dependencies
+    #   run: dotnet restore
+    # - name: Build
+    #   run: dotnet build --configuration Release --no-restore
+    # - name: Test
+    #   run: dotnet test --no-restore --verbosity normal
     - name: Deploy
       env:
         KNOWN_HOST: ${{ secrets.KNOWN_HOST }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
       run: |
-        dotnet publish --configuration Release --no-restore
+        # dotnet publish --configuration Release --no-restore
         mkdir -p ~/.ssh
         echo $KNOWN_HOST >> ~/.ssh/known_hosts
         echo -n $SSH_KEY >> tilde.pem
         chmod 0600 tilde.pem
-        rsync -a -e "ssh -i tilde.pem" bin/Release/net5.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net5.0/publish
+        ssh -i tilde.pem root@forum.robsigler.com echo
+        # rsync -a -e "ssh -i tilde.pem" bin/Release/net5.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net5.0/publish
