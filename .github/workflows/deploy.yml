@@ -33,8 +33,7 @@ jobs:
         echo -n $SSH_KEY >> ~/.ssh/tilde.pem
         chmod 600 ~/.ssh/tilde.pem
         cat ~/.ssh/tilde.pem | wc -c
-        cat ~/.ssh/tilde.pem | head -n 3
-        cat ~/.ssh/tilde.pem | tail -n 3
+        sha1sum ~/.ssh/tilde.pem
         ssh -V
         ssh -i ~/.ssh/tilde.pem root@135.181.203.90 echo
         # rsync -a -e "ssh -i tilde.pem" bin/Release/net5.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net5.0/publish
