@@ -32,5 +32,6 @@ jobs:
         echo $KNOWN_HOST >> ~/.ssh/known_hosts
         echo -n $SSH_KEY >> tilde.pem
         chmod 0600 tilde.pem
+        ssh -V
         ssh -i tilde.pem root@135.181.203.90 echo
         # rsync -a -e "ssh -i tilde.pem" bin/Release/net5.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net5.0/publish
