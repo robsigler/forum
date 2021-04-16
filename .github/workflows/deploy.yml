@@ -30,9 +30,11 @@ jobs:
         # dotnet publish --configuration Release --no-restore
         mkdir -p ~/.ssh
         echo $KNOWN_HOST >> ~/.ssh/known_hosts
-        echo -n $SSH_KEY >> tilde.pem
-        chmod 0600 tilde.pem
-        cat tilde.pem | wc -c
+        echo -n $SSH_KEY >> ~/.ssh/tilde.pem
+        chmod 600 ~/.ssh/tilde.pem
+        cat ~/.ssh/tilde.pem | wc -c
+        cat ~/.ssh/tilde.pem | head -n 3
+        cat ~/.ssh/tilde.pem | tail -n 3
         ssh -V
-        ssh -i tilde.pem root@135.181.203.90 echo
+        ssh -i ~/.ssh/tilde.pem root@135.181.203.90 echo
         # rsync -a -e "ssh -i tilde.pem" bin/Release/net5.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net5.0/publish
