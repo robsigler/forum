@@ -23,9 +23,12 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
     - name: Deploy
       env:
+        KNOWN_HOST: ${{ secrets.KNOWN_HOST }}
         SSH_KEY: ${{ secrets.SSH_KEY }}
       run: |
         dotnet publish --configuration Release --no-restore
+        mkdir -p ~/.ssh
+        echo $KNOWN_HOST >> ~/.ssh/known_hosts
         echo $SSH_KEY >> tilde.pem
         chmod 0600 tilde.pem
         rsync -a -e "ssh -i tilde.pem" bin/Release/net5.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net5.0/publish
