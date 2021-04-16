@@ -1,14 +1,15 @@
-name: Build
+name: Deploy
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
-
+  deploy:
+    environment:
+      name: prod
+      url: https://forum.robsigler.com
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core
