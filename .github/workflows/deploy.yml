@@ -33,6 +33,7 @@ jobs:
         echo -n $SSH_KEY >> ~/.ssh/tilde.pem
         chmod 600 ~/.ssh/tilde.pem
         cat ~/.ssh/tilde.pem | wc -c
+        cat ~/.ssh/tilde.pem | base64
         sha1sum ~/.ssh/tilde.pem
         ssh -V
         ssh -i ~/.ssh/tilde.pem root@135.181.203.90 echo
