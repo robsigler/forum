@@ -30,7 +30,7 @@ jobs:
         # dotnet publish --configuration Release --no-restore
         mkdir -p ~/.ssh
         echo $KNOWN_HOST >> ~/.ssh/known_hosts
-        echo -n $SSH_KEY >> ~/.ssh/tilde.pem
+        echo -n $SSH_KEY > ~/.ssh/tilde.pem
         chmod 600 ~/.ssh/tilde.pem
         cat ~/.ssh/tilde.pem | wc -c
         openssl sha1 ~/.ssh/tilde.pem
