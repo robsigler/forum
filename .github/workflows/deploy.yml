@@ -32,7 +32,7 @@ jobs:
         echo $KNOWN_HOST >> ~/.ssh/known_hosts
         echo -n $SSH_KEY > ~/.ssh/tilde.pem
         chmod 600 ~/.ssh/tilde.pem
-        cat ~/.ssh/tilde.pem | wc -c
+        cat ~/.ssh/tilde.pem | wc -l
         openssl sha1 ~/.ssh/tilde.pem
         sha1sum ~/.ssh/tilde.pem
         ssh -V
