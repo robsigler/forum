@@ -25,12 +25,12 @@ jobs:
     - name: Deploy
       env:
         KNOWN_HOST: ${{ secrets.KNOWN_HOST }}
-        SSH_KEY: ${{ secrets.SSH_KEY }}
+        BASE64_SSH_KEY: ${{ secrets.BASE64_SSH_KEY }}
       run: |
         # dotnet publish --configuration Release --no-restore
         mkdir -p ~/.ssh
         echo $KNOWN_HOST >> ~/.ssh/known_hosts
-        echo -n $SSH_KEY > ~/.ssh/tilde.pem
+        echo -n $BASE64_SSH_KEY | base64 --decode >> ~/.ssh/tilde.pem
         chmod 600 ~/.ssh/tilde.pem
         cat ~/.ssh/tilde.pem | wc -l
         openssl sha1 ~/.ssh/tilde.pem
