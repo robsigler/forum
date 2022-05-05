@@ -29,8 +29,8 @@ jobs:
       run: |
         dotnet publish --configuration Release --no-restore
         mkdir -p ~/.ssh
-        echo $KNOWN_HOST >> ~/.ssh/known_hosts
+        echo ${{ secrets.KNOWN_HOST }} >> ~/.ssh/known_hosts
         echo -n $BASE64_SSH_KEY | base64 --decode >> ~/.ssh/tilde.pem
         chmod 600 ~/.ssh/tilde.pem
-        rsync -a -e "ssh -i ~/.ssh/tilde.pem" bin/Release/net6.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net6.0/publish
+        rsync --mkpath -a -e "ssh -i ~/.ssh/tilde.pem" bin/Release/net6.0/publish/ root@forum.robsigler.com:/var/www/forum-app/bin/Release/net6.0/publish
         ssh -i ~/.ssh/tilde.pem root@forum.robsigler.com "systemctl restart forum.service"
