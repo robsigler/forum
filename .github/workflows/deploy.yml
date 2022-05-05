@@ -24,14 +24,12 @@ jobs:
       run: dotnet test --no-restore --verbosity normal
     - name: Deploy
       env:
-        KNOWN_HOST: ${{ secrets.KNOWN_HOST }}
-        BASE64_SSH_KEY: ${{ secrets.BASE64_SSH_KEY }}
         PUBLISH_FOLDER: "/var/www/forum-app/bin/Release/net6.0/publish"
       run: |
         dotnet publish --configuration Release --no-restore
         mkdir -p ~/.ssh
         echo "${{ secrets.KNOWN_HOST }}" >> ~/.ssh/known_hosts
-        echo -n $BASE64_SSH_KEY | base64 --decode >> ~/.ssh/tilde.pem
+        echo -n "${{ secrets.BASE64_SSH_KEY }}"| base64 --decode >> ~/.ssh/tilde.pem
         chmod 600 ~/.ssh/tilde.pem
         ssh -i ~/.ssh/tilde.pem root@forum.robsigler.com "mkdir -p $PUBLISH_FOLDER"
         rsync -a -e "ssh -i ~/.ssh/tilde.pem" bin/Release/net6.0/publish/ root@forum.robsigler.com:$PUBLISH_FOLDER
