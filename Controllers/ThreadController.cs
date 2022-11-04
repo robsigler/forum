@@ -129,7 +129,7 @@ namespace Forum.Controllers
                     post.ThreadId = id;
                     _context.Posts.Add(post);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToRoute("GetThread", new { id = id });
                 }
             }
             catch (DbUpdateException ex)
