@@ -1,7 +1,7 @@
 name: Deploy
 
 on:
-  push:
+  pull_request:
     branches: [ main ]
 
 jobs:
@@ -11,7 +11,11 @@ jobs:
       url: https://forum.robsigler.com
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}
+    # - name: Verify PR is up-to-date with main
+    #   run: git fetch origin && git merge-base --is-ancestor origin/main ${{ github.head_ref }}
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
