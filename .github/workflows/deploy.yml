@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Check git status
+      run: git status
     - name: Verify PR is up-to-date with main
       run: git merge-base --is-ancestor ${{ github.head_ref }} main
     - name: Setup .NET Core
