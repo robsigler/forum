@@ -12,7 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-      ref: ${{ github.head_ref }}
+      with:
+        ref: ${{ github.head_ref }}
     - name: Check git status
       run: git status
     - name: Verify PR is up-to-date with main
