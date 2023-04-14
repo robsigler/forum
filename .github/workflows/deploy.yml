@@ -5,19 +5,14 @@ on:
     branches: [ main ]
 
 jobs:
-  validate-up-to-date:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check PR
-      uses: Automattic/action-pr-is-up-to-date@v2
   deploy:
-    needs:
-    - "validate-up-to-date"
     environment:
       name: prod
       url: https://forum.robsigler.com
     runs-on: ubuntu-latest
     steps:
+    - name: Verify PR is up-to-date with main
+      run: git merge-base --is-ancestor master
     - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
