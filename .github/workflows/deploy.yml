@@ -11,9 +11,9 @@ jobs:
       url: https://forum.robsigler.com
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: Verify PR is up-to-date with main
       run: git merge-base --is-ancestor master
-    - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
