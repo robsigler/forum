@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Verify PR is up-to-date with main
-      run: git merge-base --is-ancestor $GITHUB_REF_NAME main
+      run: git merge-base --is-ancestor ${{ github.head_ref }} main
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
