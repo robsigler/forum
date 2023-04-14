@@ -15,7 +15,7 @@ jobs:
       with:
         ref: ${{ github.head_ref }}
     - name: Verify PR is up-to-date with main
-      run: git fetch origin && git merge-base --is-ancestor ${{ github.head_ref }} main
+      run: git fetch origin && git merge-base --is-ancestor ${{ github.head_ref }} origin/main
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
