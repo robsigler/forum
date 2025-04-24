@@ -34,6 +34,7 @@ namespace Forum.Controllers
         {
             var count = _context.Threads.Count();
             var items = _context.Threads
+                .OrderBy(s => s.CreatedDate)
                 .Take(5)
                 .Include(t => t.Author)
                 .ToList();
