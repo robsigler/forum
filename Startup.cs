@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -29,9 +30,18 @@ namespace Forum
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            // services.AddDbContext<ApplicationDbContext>(options =>
+            //     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
+            services.AddAuthentication().AddMicrosoftAccount(microsoftOptions =>
+            {
+                string clientId = Configuration["Authentication:Microsoft:ClientId"];
+                microsoftOptions.ClientId = clientId
+                                            ?? throw new Exception("Missing Authentication:Microsoft:ClientId");
+                string clientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
+                microsoftOptions.ClientSecret = clientSecret
+                                                ?? throw new Exception("Missing Authentication:Microsoft:ClientSecret");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
