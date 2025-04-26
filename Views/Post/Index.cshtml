@@ -1,0 +1,27 @@
+﻿@{
+    ViewData["Title"] = "Posts";
+}
+
+<div class="above-threads mb-2">
+  <a type="button" class="btn btn-primary" href="/posts/Create">Create New Thread</a>
+</div>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">Subject</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (Post post in Model)
+    {
+        <tr>
+            <th scope="row">
+                <h5 class="mb-1">
+                    <a href="/posts/@Html.DisplayFor(modelItem => post.ID)">@Html.DisplayFor(modelItem => post.Subject)</a>
+                </h5>
+                <p class="mb-1">by @Html.DisplayFor(modelItem => post.Author.UserName), on @Html.DisplayFor(modelItem => post.CreatedDate)</p>
+            </th>
+        </tr>
+    }
+  </tbody>
+</table>

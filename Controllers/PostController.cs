@@ -9,19 +9,18 @@ using Forum.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using SQLitePCL;
 
 namespace Forum.Controllers
 {
-    [Route("threads")]
+    [Route("posts")]
     [Controller]
-    public class ThreadController : Controller
+    public class PostController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<ThreadController> _logger;
+        private readonly ILogger<PostController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ThreadController(ILogger<ThreadController> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public PostController(ILogger<PostController> logger, ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _context = context;
@@ -32,8 +31,8 @@ namespace Forum.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var count = _context.Threads.Count();
-            var items = _context.Threads
+            var count = _context.Posts.Count();
+            var items = _context.Posts
                 .OrderBy(s => s.CreatedDate)
                 .Take(5)
                 .Include(t => t.Author)
@@ -52,25 +51,20 @@ namespace Forum.Controllers
         [HttpPost("create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Subject,Body")] NewThreadViewModel newThreadViewModel)
+            [Bind("Subject,Body")] NewPostViewModel newPostViewModel)
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            var thread = new Thread();
+            var post = new Post();
             try
             {
                 if (ModelState.IsValid)
                 {
-                    thread.Subject = newThreadViewModel.Subject;
-                    thread.CreatedDate = DateTime.Now;
-                    thread.AuthorId = user.Id;
-                    _context.Threads.Add(thread);
-                    await _context.SaveChangesAsync();
-                    // TODO: handle situation where thread gets created but post does not
-                    var post = new Post();
-                    post.Body = newThreadViewModel.Body;
+                    post.Subject = newPostViewModel.Subject;
                     post.CreatedDate = DateTime.Now;
                     post.AuthorId = user.Id;
-                    post.ThreadId = thread.ID;
+                    post.Body = newPostViewModel.Body;
+                    post.CreatedDate = DateTime.Now;
+                    post.AuthorId = user.Id;
                     _context.Posts.Add(post);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
@@ -83,7 +77,7 @@ namespace Forum.Controllers
                                              "Try again, and if the problem persists " +
                                              "see your system administrator.");
             }
-            return Redirect("/threads/" + thread.ID);
+            return Redirect("/posts/" + post.ID);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -94,11 +88,13 @@ namespace Forum.Controllers
 
         [Authorize]
         [HttpGet]
-        [Route("{id:int}", Name="GetThread")]
-        public async Task<IActionResult> GetThread(int id)
+        [Route("{id:int}", Name="GetPost")]
+        public async Task<IActionResult> GetPost(int id)
         {
-            var thread = (await _context.Threads.Include(t => t.Posts).ThenInclude(p => p.Author).FirstOrDefaultAsync(t => t.ID == id));
-            return View("Get", thread);
+            var post = (await _context.Posts
+                .Include(p => p.Author)
+                .FirstOrDefaultAsync(t => t.ID == id));
+            return View("Get", post);
         }
 
         [Authorize]
@@ -106,7 +102,6 @@ namespace Forum.Controllers
         public IActionResult GetNewReplyPage(int id)
         {
             var viewModel = new NewReplyViewModel();
-            viewModel.ThreadId = id;
             return View("Reply/Create", viewModel);
         }
 
@@ -127,7 +122,6 @@ namespace Forum.Controllers
                     post.Body = newReplyViewModel.Body;
                     post.CreatedDate = DateTime.Now;
                     post.AuthorId = user.Id;
-                    post.ThreadId = id;
                     _context.Posts.Add(post);
                     await _context.SaveChangesAsync();
                     return RedirectToRoute("GetThread", new { id = id });
@@ -140,7 +134,7 @@ namespace Forum.Controllers
                                              "Try again, and if the problem persists " +
                                              "see your system administrator.");
             }
-            return Redirect("/threads");
+            return Redirect("/posts");
         }
     }
 }

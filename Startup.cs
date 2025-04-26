@@ -69,9 +69,6 @@ namespace Forum
 
             app.UseEndpoints(endpoints =>
             {
-                // endpoints.MapControllerRoute(name: "threads",
-                //     pattern: "threads/{action=Index}/{id?}",
-                //     defaults: new {controller = "Thread"});
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");

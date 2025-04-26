@@ -1,0 +1,29 @@
+@model Forum.Models.Post
+
+@{
+    ViewData["Title"] = "Post";
+}
+
+
+<div class="above-threads mb-2">
+  <a type="button" class="btn btn-primary" href="/posts/@Html.DisplayFor(modelItem => Model.ID)/reply">Post a Reply</a>
+</div>
+
+<div class="container">
+  @* @foreach (Post post in Model.Posts) *@
+  @* { *@
+  @*     <div class="row my-2"> *@
+  @*         <div class="col-2 border"> *@
+  @*             <div> *@
+  @*               @Html.DisplayFor(modelItem => post.Author.UserName) *@
+  @*             </div> *@
+  @*             <div> *@
+  @*               @Html.DisplayFor(modelItem => post.Author.JoinDate) *@
+  @*             </div> *@
+  @*         </div> *@
+  @*         <div class="col-10 border"> *@
+  @*             @Html.DisplayFor(modelItem => post.Body) *@
+  @*         </div> *@
+  @*     </div> *@
+  @* } *@
+</div>
