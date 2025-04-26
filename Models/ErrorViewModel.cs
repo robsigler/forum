@@ -1,12 +1,10 @@
-using System;
-
 namespace Forum.Models
 {
     public class ErrorViewModel
     {
-        #nullable enable
+#nullable enable
         public string? RequestId { get; set; }
-        #nullable disable
+#nullable disable
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
     }

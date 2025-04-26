@@ -83,12 +83,12 @@ namespace Forum.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         [Authorize]
         [HttpGet]
-        [Route("{id:int}", Name="GetPost")]
+        [Route("{id:int}", Name = "GetPost")]
         public async Task<IActionResult> GetPost(int id)
         {
             var post = (await _context.Posts
@@ -107,7 +107,7 @@ namespace Forum.Controllers
 
         [Authorize]
         [HttpPost("{id:int}/reply")]
-        [Route("{id:int}/reply", Name="PostReply")]
+        [Route("{id:int}/reply", Name = "PostReply")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> PostReply(
             int id,

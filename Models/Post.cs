@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Forum.Models
 {
