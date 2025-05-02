@@ -33,6 +33,7 @@ namespace Forum.Controllers
         {
             var count = _context.Posts.Count();
             var items = _context.Posts
+                .Where(p => p.ParentId == 0)
                 .OrderBy(s => s.CreatedDate)
                 .Take(5)
                 .Include(t => t.Author)
@@ -64,6 +65,7 @@ namespace Forum.Controllers
                     post.AuthorId = user.Id;
                     post.Body = newPostViewModel.Body;
                     post.CreatedDate = DateTime.Now;
+                    post.UpdatedDate = DateTime.Now;
                     post.AuthorId = user.Id;
                     _context.Posts.Add(post);
                     await _context.SaveChangesAsync();
@@ -91,10 +93,15 @@ namespace Forum.Controllers
         [Route("{id:int}", Name = "GetPost")]
         public async Task<IActionResult> GetPost(int id)
         {
-            var post = (await _context.Posts
+            var viewModel = new GetPostViewModel();
+            viewModel.Id = id;
+            viewModel.Posts = await _context.Posts
+                .Where(p => p.ID.Equals(id) || p.ParentId.Equals(id))
+                .OrderBy(s => s.CreatedDate)
+                .Take(5)
                 .Include(p => p.Author)
-                .FirstOrDefaultAsync(t => t.ID == id));
-            return View("Get", post);
+                .ToListAsync();
+            return View("Get", viewModel);
         }
 
         [Authorize]
@@ -121,10 +128,12 @@ namespace Forum.Controllers
                     var post = new Post();
                     post.Body = newReplyViewModel.Body;
                     post.CreatedDate = DateTime.Now;
+                    post.UpdatedDate = DateTime.Now;
                     post.AuthorId = user.Id;
+                    post.ParentId = id;
                     _context.Posts.Add(post);
                     await _context.SaveChangesAsync();
-                    return RedirectToRoute("GetThread", new { id = id });
+                    return RedirectToRoute("GetPost", new { id = id });
                 }
             }
             catch (DbUpdateException ex)

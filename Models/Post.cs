@@ -8,8 +8,9 @@ namespace Forum.Models
         public string Subject { get; set; }
         public string Body { get; set; }
         public DateTime CreatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
         public string AuthorId { get; set; }
-        public string ParentId { get; set; }
+        public int ParentId { get; set; }
         public virtual ApplicationUser Author { get; set; }
     }
 }
