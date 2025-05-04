@@ -1,4 +1,5 @@
 using System;
+using Forum.Areas.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
@@ -42,6 +43,7 @@ namespace Forum
                 microsoftOptions.ClientSecret = clientSecret
                                                 ?? throw new Exception("Missing Authentication:Microsoft:ClientSecret");
             });
+            services.AddScoped<SignInManager<ApplicationUser>, CustomSignInManager<ApplicationUser>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
