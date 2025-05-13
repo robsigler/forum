@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Forum.Data;
 using Forum.Models;
+using Forum.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,6 +46,8 @@ namespace Forum
                                                 ?? throw new Exception("Missing Authentication:Microsoft:ClientSecret");
             });
             services.AddScoped<SignInManager<ApplicationUser>, CustomSignInManager<ApplicationUser>>();
+            services.AddSingleton<IEmailSender, AzureEmailSender>(_ =>
+                new AzureEmailSender(Configuration["Email:Azure:ConnectionString"]));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
