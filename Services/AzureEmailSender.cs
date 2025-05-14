@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Communication.Email;
+using Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal;
 using Microsoft.Extensions.Configuration;
 
 namespace Forum.Services
@@ -24,14 +25,14 @@ namespace Forum.Services
 
             var emailContent = new EmailContent(subject)
             {
-                PlainText = htmlMessage
+                Html = htmlMessage
             };
 
             var toRecipients = new List<EmailAddress>()
             {
                 new EmailAddress(email)
             };
-
+            
             var emailRecipients = new EmailRecipients(toRecipients);
 
             var emailMessage = new EmailMessage(sender, emailRecipients, emailContent);
