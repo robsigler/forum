@@ -17,13 +17,17 @@
                 <div>
                     @Html.DisplayFor(modelItem => post.Author.UserName)
                 </div>
-                <div>
-                    @Html.DisplayFor(modelItem => post.Author.JoinDate)
+                <div class="small-text">
+                    Joined: @Html.DisplayFor(modelItem => post.Author.JoinDate)
                 </div>
             </div>
             <div class="col-6 border">
-                @Html.DisplayFor(modelItem => post.Body)
-                Posted @Html.DisplayFor(modelItem => post.CreatedDate)
+                <div class="small-text">
+                    Posted @Html.DisplayFor(modelItem => post.CreatedDate)
+                </div>
+                <div>
+                    @Html.DisplayFor(modelItem => post.Body)
+                </div>
             </div>
         </div>
     }

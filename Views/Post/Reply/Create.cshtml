@@ -4,9 +4,7 @@
     ViewData["Title"] = "Post a Reply";
 }
 
-<h1>Create</h1>
-
-<h4>Thread</h4>
+<h4>Reply to Thread</h4>
 <hr/>
 <div class="row">
     <div class="col-md-4">
@@ -17,11 +15,12 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Body" class="control-label"></label>
-                <input asp-for="Body" class="form-control"/>
+                <textarea asp-for="Body" class="form-control">
+                </textarea>
                 <span asp-validation-for="Body" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary"/>
+                <input type="submit" value="Reply" class="btn btn-primary"/>
             </div>
         </form>
     </div>
